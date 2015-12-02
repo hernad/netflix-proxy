@@ -120,7 +120,7 @@ if [[ "${b}" == "1" ]]; then
 
 
         dns_port=5300
-        proxy_port=4330
+        proxy_port=4430
 else
 	echo "Starting Docker containers (from repository)"
 	sudo $(which docker) run --name bind -d -v ${root}/data:/data -p 53:53/udp -t ab77/bind
