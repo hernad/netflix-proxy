@@ -19,6 +19,7 @@ SNIPROXY_CONTAINER_IP=`docker inspect --format '{{ .NetworkSettings.IPAddress }}
 iptables -t nat -I PREROUTING -s adsl.out.ba/32 -i eth0 -p tcp --dport 80  -j DNAT --to-dest $SNIPROXY_CONTAINER_IP:80
 iptables -t nat -I PREROUTING -s adsl.out.ba/32 -i eth0 -p tcp --dport 443 -j DNAT --to-dest $SNIPROXY_CONTAINER_IP:443
 
+iptables -F FRIENDS
 iptables-save > /etc/iptables.rules
 
 echo /etc/iptables.rules koristi update_firewall.pl skripta
