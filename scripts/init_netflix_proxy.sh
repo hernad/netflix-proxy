@@ -6,9 +6,11 @@ if [[ ! -f /etc/iptables.rules ]] ; then
 fi
 
 echo build docker images
+cd /opt/netflix-proxy
 ./build.sh -b 1
 
 
+sleep 5
 
 BIND_CONTAINER_IP=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' bind`
 iptables -t nat -I PREROUTING -p udp -i eth0 --dport 53 -j DNAT --to-destination $BIND_CONTAINER_IP:53

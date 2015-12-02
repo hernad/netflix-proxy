@@ -115,7 +115,6 @@ if [[ "${b}" == "1" ]]; then
         sudo $(which docker) rm -f bind
         sudo $(which docker) rm -f sniproxy
 	sudo $(which docker) run --name bind -d -v ${root}/data:/data -p 5300:53/udp -t bind
-	#sudo $(which docker) run --name sniproxy -d -v ${root}/data:/data --net=host -t sniproxy
 	sudo $(which docker) run --name sniproxy -d -v ${root}/data:/data -p 4430:443 -p 8080:80  -t sniproxy
 
 
