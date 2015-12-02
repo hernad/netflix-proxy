@@ -9,6 +9,9 @@ if [[ ! -f /etc/iptables.rules ]] ; then
   echo created /etc/iptables.rules
 fi
 
+echo build docker images
+./build.sh -b 1
+
 echo echo "crontabl -e"
 echo echo "add next line:"
 echo "*/7 * * * * /opt/netflix-proxy/scripts/update_firewall.pl"
