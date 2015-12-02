@@ -3,7 +3,7 @@
 # Note, this script assumes Ubuntu Linux and it will most likely fail on any other distribution.
 
 # bomb on any error
-set -e
+# set -e
 
 # change to working directory
 root="/opt/netflix-proxy"
@@ -78,8 +78,10 @@ fi
 # switch to working directory
 pushd ${root}
 
+echo test-0
 # configure iptables
 sudo iptables -N FRIENDS
+echo test-0b
 sudo iptables -A FRIENDS -s $clientip/32 -j ACCEPT
 sudo iptables -A FRIENDS -j DROP
 sudo iptables -N ALLOW
@@ -103,14 +105,18 @@ echo "Updating db.override with ipaddr"=$extip "and date="$date
 sudo $(which sed) -i "s/127.0.0.1/${extip}/g" data/db.override
 sudo $(which sed) -i "s/YYYYMMDD/${date}/g" data/db.override
 
+echo test-1
 if [[ "${b}" == "1" ]]; then
 	echo "Building docker containers"
 	sudo $(which docker) build -t bind docker-bind
 	sudo $(which docker) build -t sniproxy docker-sniproxy
 
 	echo "Starting Docker containers (local)"
-	sudo $(which docker) run --name bind -d -v ${root}/data:/data -p 53:53/udp -t bind
-	sudo $(which docker) run --name sniproxy -d -v ${root}/data:/data --net=host -t sniproxy
+        sudo $(which docker) rm -f bind
+        sudo $(which docker) rm -f sniproxy
+	sudo $(which docker) run --name bind -d -v ${root}/data:/data -p 5300:53/udp -t bind
+	#sudo $(which docker) run --name sniproxy -d -v ${root}/data:/data --net=host -t sniproxy
+	sudo $(which docker) run --name sniproxy -d -v ${root}/data:/data -p 4430:443 -p 8080:80  -t sniproxy
 else
 	echo "Starting Docker containers (from repository)"
 	sudo $(which docker) run --name bind -d -v ${root}/data:/data -p 53:53/udp -t ab77/bind
