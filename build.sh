@@ -117,14 +117,18 @@ if [[ "${b}" == "1" ]]; then
 	sudo $(which docker) run --name bind -d -v ${root}/data:/data -p 5300:53/udp -t bind
 	#sudo $(which docker) run --name sniproxy -d -v ${root}/data:/data --net=host -t sniproxy
 	sudo $(which docker) run --name sniproxy -d -v ${root}/data:/data -p 4430:443 -p 8080:80  -t sniproxy
+
+
+        dns_port=5300
 else
 	echo "Starting Docker containers (from repository)"
 	sudo $(which docker) run --name bind -d -v ${root}/data:/data -p 53:53/udp -t ab77/bind
 	sudo $(which docker) run --name sniproxy -d -v ${root}/data:/data --net=host -t ab77/sniproxy
+        dns_port=53
 fi
 
-echo "Testing DNS"
-$(which dig) netflix.com @$extip
+echo "Testing DNS, extip=$extip"
+$(which dig) -p $dns_port netflix.com @$extip
 
 echo "Testing proxy"
 echo "GET /" | $(which openssl) s_client -servername netflix.com -connect $extip:443
