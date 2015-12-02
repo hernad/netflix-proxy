@@ -2,7 +2,7 @@
 
 ROOT_DIR=/opt/netflix-proxy
 
-PATH=/sbin:/bin:/usr/bin:/usr/local/bin
+PATH=/sbin:/bin:/usr/bin:/usr/local/sbin:/usr/local/bin
 
 if [[ ! -f /etc/iptables.rules ]] ; then
   iptables-save > /etc/iptables.rules
@@ -16,11 +16,21 @@ $ROOT_DIR/build.sh -b 1
 status1=""
 status2=""
 
+
 while [[ "$status1 $status2" != "running running" ]] ; do
   status1=`docker inspect --format '{{ .State.Status }}' bind`
   status2=`docker inspect --format '{{ .State.Status }}' sniproxy`
+
+
+  [ "$status1" != "running" ] && ( docker rm -f bind ;\
+        docker run --name bind -d -v ${ROOT_DIR}/data:/data -p 5300:53/udp -t bind )
+  [ "$status2" != "running" ] && ( docker rm -f sniproxy ;\  
+       docker run --name sniproxy -d -v ${ROOT_DIR}/data:/data -p 4430:443 -p 8080:80  -t sniproxy )
+
+  if [[ "$status1 $status2" != "running running" ]] ; then
+      sleep 5
+  fi
   echo "status bind: $status1, status sniproxy: $status2"
-  sleep 2
 done
 
 BIND_CONTAINER_IP=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' bind`
